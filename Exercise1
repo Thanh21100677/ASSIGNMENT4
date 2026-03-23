@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// struct node
+struct node {
+    int data;
+    struct node* next;
+};
+
+// (a) display
+void display(struct node* head) {
+    struct node* temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+// (b) addback
+struct node* addback(struct node* head, int data) {
+    struct node* newNode = (struct node*)malloc(sizeof(struct node));
+    newNode->data = data;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        return newNode;
+    }
+
+    struct node* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+
+    return head;
+}
+
+// (c) find
+struct node* find(struct node* head, int data) {
+    struct node* temp = head;
+    while (temp != NULL) {
+        if (temp->data == data) {
+            return temp;
+        }
+        temp = temp->next;
+    }
+    return NULL;
+}
+
+// (d) delnode
+struct node* delnode(struct node* head, struct node* pelement) {
+    if (head == NULL || pelement == NULL) return head;
+
+    // nếu xóa head
+    if (head == pelement) {
+        struct node* temp = head;
+        head = head->next;
+        free(temp);
+        return head;
+    }
+
+    struct node* prev = head;
+    while (prev->next != NULL && prev->next != pelement) {
+        prev = prev->next;
+    }
+
+    if (prev->next == pelement) {
+        prev->next = pelement->next;
+        free(pelement);
+    }
+
+    return head;
+}
+
+// (e) freelist
+void freelist(struct node* head) {
+    struct node* temp;
+    while (head != NULL) {
+        temp = head;
+        head = head->next;
+        free(temp);
+    }
+}
+
+// (f) test
+int main() {
+    struct node* head = NULL;
+
+    // thêm phần tử
+    head = addback(head, 10);
+    head = addback(head, 20);
+    head = addback(head, 30);
+    head = addback(head, 40);
+
+    printf("Danh sach ban dau:\n");
+    display(head);
+
+    // tìm
+    struct node* found = find(head, 30);
+    if (found != NULL)
+        printf("Tim thay: %d\n", found->data);
+    else
+        printf("Khong tim thay\n");
+
+    // xóa
+    head = delnode(head, found);
+    printf("Sau khi xoa 30:\n");
+    display(head);
+
+    // giải phóng
+    freelist(head);
+    head = NULL;
+
+    return 0;
+}
